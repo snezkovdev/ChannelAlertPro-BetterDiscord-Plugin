@@ -1,0 +1,34 @@
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node (если когда-нибудь появятся скрипты сборки)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Temp
+*.tmp
+*.temp
+*.bak
+
+# Custom sounds (не коммитить пользовательские звуки)
+sounds/custom/
+*.mp3
+*.wav
+*.ogg
