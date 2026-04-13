@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ChannelAlertPro — BetterDiscord Plugin v2.0.0</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style>
+  body { background: #0f1117; font-family: 'Segoe UI', sans-serif; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #1a1d27; }
+  ::-webkit-scrollbar-thumb { background: #5865f2; border-radius: 3px; }
+
+  .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+  .glow-indigo { box-shadow: 0 0 40px 0 rgba(88,101,242,0.25); }
+  .glow-green  { box-shadow: 0 0 20px 0 rgba(87,242,135,0.15); }
+
+  .code-block {
+    background: #1a1d27;
+    border: 1px solid #2d3147;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .code-block pre {
+    overflow-x: auto;
+    white-space: pre;
+    padding: 20px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  }
+  .kw  { color: #c792ea; }
+  .fn  { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .cm  { color: #546e7a; font-style: italic; }
+  .num { color: #f78c6c; }
+  .pn  { color: #89ddff; }
+
+  .feature-card {
+    background: #1a1d27;
+    border: 1px solid #2d3147;
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color .2s, transform .2s;
+  }
+  .feature-card:hover { border-color: #5865f2; transform: translateY(-2px); }
+
+  .step-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #5865f2, #7289da);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(88,101,242,0.4);
+  }
+
+  .tab-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: #72767d;
+    transition: all .15s;
+  }
+  .tab-btn.active { background: #5865f2; color: #fff; }
+  .tab-btn:hover:not(.active) { background: #2d3147; color: #dcddde; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .sound-demo-btn {
+    background: #1e1f22;
+    border: 1.5px solid #3f4147;
+    border-radius: 8px;
+    color: #b5bac1;
+    padding: 10px 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+    font-size: 13px;
+  }
+  .sound-demo-btn:hover { border-color: #5865f2; color: #fff; background: #27293d; }
+  .sound-demo-btn.playing { border-color: #57f287; background: #1a3d2b; color: #57f287; animation: pulse 0.6s infinite alternate; }
+
+  @keyframes pulse { from { opacity: 0.8; } to { opacity: 1; } }
+
+  .ui-mockup {
+    background: #2b2d31;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #1e1f22;
+  }
+  .ui-mockup-header {
+    background: #313338;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #b5bac1;
+    border-bottom: 1px solid #1e1f22;
+  }
+  .dot-red    { width:10px; height:10px; border-radius:50%; background:#ed4245; }
+  .dot-yellow { width:10px; height:10px; border-radius:50%; background:#faa61a; }
+  .dot-green  { width:10px; height:10px; border-radius:50%; background:#57f287; }
+
+  .rule-mock {
+    margin: 10px;
+    background: #313338;
+    border-radius: 10px;
+    border: 1px solid #3f4147;
+    overflow: hidden;
+  }
+  .rule-mock-header {
+    background: #383a40;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .rule-status { width:8px; height:8px; border-radius:50%; background:#57f287; }
+  .rule-mock-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #b5bac1; }
+  .rule-field { display: flex; justify-content: space-between; }
+  .rule-val { color: #c3e88d; font-family: monospace; }
+
+  .toggle-mock {
+    width: 38px; height: 20px;
+    background: #5865f2;
+    border-radius: 20px;
+    position: relative;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .toggle-mock::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px; right: 3px;
+  }
+
+  .changelog-item { display: flex; gap: 12px; align-items: flex-start; }
+  .changelog-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+</style>
+</head>
+<body class="text-gray-200 min-h-screen">
+
+<!-- ══════ HEADER ══════ -->
+<header class="border-b border-gray-800 bg-gray-900/70 backdrop-blur sticky top-0 z-50">
+  <div class="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="text-2xl">🔔</div>
+      <div>
+        <div class="font-bold text-white text-base leading-tight">ChannelAlertPro</div>
+        <div class="text-xs text-gray-500">BetterDiscord Plugin</div>
+      </div>
+      <span class="badge bg-indigo-600 text-white ml-1">v2.0.0</span>
+      <span class="badge bg-green-900 text-green-400">MULTI-RULE</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="https://github.com/YOUR_USERNAME/ChannelAlertPro" target="_blank"
+         class="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors border border-gray-600">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        GitHub
+      </a>
+      <a href="ChannelAlertPro.plugin.js" download
+         class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors">
+        ⬇ Скачать плагин
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ══════ HERO ══════ -->
+<section class="border-b border-gray-800/60">
+  <div class="max-w-5xl mx-auto px-6 py-14">
+    <div class="flex flex-col lg:flex-row gap-10 items-center">
+      <!-- Текст -->
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="badge bg-indigo-900/80 text-indigo-300">🆕 Версия 2.0</span>
+          <span class="badge bg-yellow-900/60 text-yellow-400">Мульти-правила</span>
+          <span class="badge bg-purple-900/60 text-purple-400">Свои звуки</span>
+        </div>
+        <h1 class="text-3xl lg:text-4xl font-black text-white mb-4 leading-tight">
+          Умные уведомления<br/>
+          <span class="text-indigo-400">для любых каналов</span>
+        </h1>
+        <p class="text-gray-400 text-base leading-relaxed mb-6">
+          Создавайте неограниченное количество правил: разные каналы, разные триггеры, разные звуки.
+          Всё настраивается прямо в интерфейсе BetterDiscord — без редактирования кода.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <div class="flex items-center gap-2 bg-gray-800/60 rounded-lg px-3 py-2 text-sm">
+            <span class="text-green-400">✓</span> Неограниченно правил
+          </div>
+          <div class="flex items-center gap-2 bg-gray-800/60 rounded-lg px-3 py-2 text-sm">
+            <span class="text-green-400">✓</span> 8 встроенных звуков
+          </div>
+          <div class="flex items-center gap-2 bg-gray-800/60 rounded-lg px-3 py-2 text-sm">
+            <span class="text-green-400">✓</span> Загрузка своих MP3/WAV
+          </div>
+          <div class="flex items-center gap-2 bg-gray-800/60 rounded-lg px-3 py-2 text-sm">
+            <span class="text-green-400">✓</span> Регулировка громкости
+          </div>
+          <div class="flex items-center gap-2 bg-gray-800/60 rounded-lg px-3 py-2 text-sm">
+            <span class="text-green-400">✓</span> Toast уведомления
+          </div>
+          <div class="flex items-center gap-2 bg-gray-800/60 rounded-lg px-3 py-2 text-sm">
+            <span class="text-green-400">✓</span> Регистр триггера
+          </div>
+        </div>
+      </div>
+
+      <!-- UI Мокап -->
+      <div class="w-full lg:w-80 flex-shrink-0">
+        <div class="ui-mockup glow-indigo">
+          <div class="ui-mockup-header">
+            <div class="dot-red"></div><div class="dot-yellow"></div><div class="dot-green"></div>
+            <span class="ml-2">⚙️ ChannelAlertPro — Настройки</span>
+          </div>
+
+          <div style="padding:8px 8px 4px">
+            <!-- Rule 1 -->
+            <div class="rule-mock">
+              <div class="rule-mock-header">
+                <div class="rule-status"></div>
+                <span>Тикеты поддержки</span>
+                <div class="toggle-mock"></div>
+              </div>
+              <div class="rule-mock-body">
+                <div class="rule-field"><span>Канал</span><span class="rule-val">881306138686148679</span></div>
+                <div class="rule-field"><span>Триггер</span><span class="rule-val">[Тикет]:</span></div>
+                <div class="rule-field"><span>Звук</span><span class="rule-val">🔔 Динь · 80%</span></div>
+              </div>
+            </div>
+
+            <!-- Rule 2 -->
+            <div class="rule-mock" style="border-color:#3f4147; opacity:.7;">
+              <div class="rule-mock-header" style="background:#2f3136;">
+                <div class="rule-status" style="background:#faa61a;"></div>
+                <span style="color:#b5bac1;">Срочные заявки</span>
+                <div class="toggle-mock" style="background:#4f545c;"></div>
+              </div>
+              <div class="rule-mock-body">
+                <div class="rule-field"><span>Канал</span><span class="rule-val">123456789012345678</span></div>
+                <div class="rule-field"><span>Триггер</span><span class="rule-val">[СРОЧНО]</span></div>
+                <div class="rule-field"><span>Звук</span><span class="rule-val">⚡ Срочно · 100%</span></div>
+              </div>
+            </div>
+
+            <!-- Add button -->
+            <div style="margin:8px 2px; border:1.5px dashed #5865f2; border-radius:8px; padding:10px; text-align:center; color:#5865f2; font-size:13px; font-weight:600; cursor:pointer;">
+              + Добавить правило
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ TABS ══════ -->
+<section class="max-w-5xl mx-auto px-6 py-10">
+  <div class="flex gap-2 mb-8 flex-wrap">
+    <button class="tab-btn active" onclick="switchTab('install', this)">📦 Установка</button>
+    <button class="tab-btn" onclick="switchTab('usage', this)">📖 Использование</button>
+    <button class="tab-btn" onclick="switchTab('sounds', this)">🎵 Звуки</button>
+    <button class="tab-btn" onclick="switchTab('code', this)">💻 Код плагина</button>
+  </div>
+
+  <!-- ── Установка ── -->
+  <div id="tab-install" class="tab-content active">
+    <div class="flex flex-col gap-5">
+
+      <div class="feature-card">
+        <h2 class="font-bold text-white text-lg mb-5">Установка плагина</h2>
+        <div class="flex flex-col gap-5">
+
+          <div class="flex gap-4 items-start">
+            <div class="step-circle">1</div>
+            <div>
+              <div class="font-semibold text-white mb-1">Скачайте файл плагина</div>
+              <p class="text-gray-400 text-sm mb-3">Нажмите кнопку ниже, чтобы скачать <code class="bg-gray-800 px-1 rounded text-indigo-300 text-xs">ChannelAlertPro.plugin.js</code></p>
+              <a href="ChannelAlertPro.plugin.js" download
+                 class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors">
+                ⬇ Скачать ChannelAlertPro.plugin.js
+              </a>
+            </div>
+          </div>
+
+          <div class="h-px bg-gray-800"></div>
+
+          <div class="flex gap-4 items-start">
+            <div class="step-circle">2</div>
+            <div class="flex-1">
+              <div class="font-semibold text-white mb-1">Поместите файл в папку плагинов</div>
+              <p class="text-gray-400 text-sm mb-3">Выберите свою ОС:</p>
+              <div class="flex flex-col gap-2">
+                <div class="bg-gray-800/80 rounded-lg px-4 py-3 flex items-center gap-3">
+                  <span class="text-lg">🪟</span>
+                  <div>
+                    <div class="text-xs text-gray-500 font-semibold uppercase mb-0.5">Windows</div>
+                    <code class="text-green-400 text-xs">%APPDATA%\BetterDiscord\plugins\</code>
+                  </div>
+                </div>
+                <div class="bg-gray-800/80 rounded-lg px-4 py-3 flex items-center gap-3">
+                  <span class="text-lg">🍎</span>
+                  <div>
+                    <div class="text-xs text-gray-500 font-semibold uppercase mb-0.5">macOS</div>
+                    <code class="text-green-400 text-xs">~/Library/Application Support/BetterDiscord/plugins/</code>
+                  </div>
+                </div>
+                <div class="bg-gray-800/80 rounded-lg px-4 py-3 flex items-center gap-3">
+                  <span class="text-lg">🐧</span>
+                  <div>
+                    <div class="text-xs text-gray-500 font-semibold uppercase mb-0.5">Linux</div>
+                    <code class="text-green-400 text-xs">~/.config/BetterDiscord/plugins/</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-px bg-gray-800"></div>
+
+          <div class="flex gap-4 items-start">
+            <div class="step-circle">3</div>
+            <div>
+              <div class="font-semibold text-white mb-1">Активируйте в BetterDiscord</div>
+              <p class="text-gray-400 text-sm">Discord → ⚙️ Настройки → <span class="text-indigo-300">BetterDiscord</span> → Plugins → Найдите <span class="text-indigo-300">ChannelAlertPro</span> → переключите тоггл</p>
+            </div>
+          </div>
+
+          <div class="h-px bg-gray-800"></div>
+
+          <div class="flex gap-4 items-start">
+            <div class="step-circle">4</div>
+            <div>
+              <div class="font-semibold text-white mb-1">Включите режим разработчика в Discord</div>
+              <p class="text-gray-400 text-sm">⚙️ Настройки Discord → Дополнительно → <span class="text-green-400">Режим разработчика</span> = ON<br/>
+              Это позволит копировать ID каналов: <span class="text-gray-300">ПКМ на канале → Копировать ID</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-card bg-yellow-900/10 border-yellow-800/40">
+        <div class="flex gap-3 items-start">
+          <span class="text-xl">⚠️</span>
+          <div>
+            <div class="font-semibold text-yellow-300 mb-1">Требования</div>
+            <ul class="text-gray-400 text-sm flex flex-col gap-1">
+              <li>• Десктопный Discord (Windows / macOS / Linux)</li>
+              <li>• BetterDiscord установлен: <a href="https://betterdiscord.app" target="_blank" class="text-indigo-400 hover:underline">betterdiscord.app</a></li>
+              <li>• Не работает в браузерной версии Discord</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Использование ── -->
+  <div id="tab-usage" class="tab-content">
+    <div class="flex flex-col gap-6">
+
+      <div class="feature-card">
+        <h2 class="font-bold text-white text-lg mb-4">Как создать правило</h2>
+        <div class="flex flex-col gap-4">
+          <div class="flex gap-3 items-start">
+            <span class="text-lg mt-0.5">① </span>
+            <div>
+              <div class="font-medium text-white text-sm">Откройте настройки плагина</div>
+              <p class="text-gray-400 text-sm">⚙️ Настройки → BetterDiscord → Plugins → ⚙ у ChannelAlertPro</p>
+            </div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <span class="text-lg mt-0.5">② </span>
+            <div>
+              <div class="font-medium text-white text-sm">Нажмите «+ Добавить правило»</div>
+              <p class="text-gray-400 text-sm">Новое правило появится внизу. Кликните на него — оно раскроется.</p>
+            </div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <span class="text-lg mt-0.5">③ </span>
+            <div>
+              <div class="font-medium text-white text-sm">Заполните поля</div>
+              <div class="flex flex-col gap-2 mt-2">
+                <div class="bg-gray-800/60 rounded-lg px-3 py-2.5">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs font-bold text-gray-500 uppercase">Название</span>
+                  </div>
+                  <p class="text-gray-400 text-xs">Любое имя для правила, например «Тикеты поддержки»</p>
+                </div>
+                <div class="bg-gray-800/60 rounded-lg px-3 py-2.5">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs font-bold text-gray-500 uppercase">ID Канала</span>
+                  </div>
+                  <p class="text-gray-400 text-xs">ПКМ на нужном канале в Discord → <span class="text-green-400">Копировать ID</span><br/>(нужен режим разработчика в настройках Discord)</p>
+                </div>
+                <div class="bg-gray-800/60 rounded-lg px-3 py-2.5">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs font-bold text-gray-500 uppercase">Текст-триггер</span>
+                  </div>
+                  <p class="text-gray-400 text-xs">Слово или фраза. Например: <code class="text-green-400 bg-gray-900 px-1 rounded">[Тикет]:</code> или <code class="text-green-400 bg-gray-900 px-1 rounded">@здесь</code><br/>Плагин срабатывает, если сообщение <strong class="text-white">содержит</strong> этот текст.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <span class="text-lg mt-0.5">④ </span>
+            <div>
+              <div class="font-medium text-white text-sm">Выберите звук и нажмите «▶ Тест звука»</div>
+              <p class="text-gray-400 text-sm">8 встроенных вариантов или загрузите свой MP3/WAV/OGG файл.</p>
+            </div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <span class="text-lg mt-0.5">⑤ </span>
+            <div>
+              <div class="font-medium text-white text-sm">Включите тоггл правила</div>
+              <p class="text-gray-400 text-sm">Зелёная точка = правило активно. Настройки сохраняются автоматически.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="feature-card">
+          <div class="text-2xl mb-3">🎯</div>
+          <div class="font-bold text-white mb-2">Несколько каналов</div>
+          <p class="text-gray-400 text-sm">Создайте отдельное правило для каждого канала. Каждое правило работает независимо со своим триггером и звуком.</p>
+        </div>
+        <div class="feature-card">
+          <div class="text-2xl mb-3">🔇</div>
+          <div class="font-bold text-white mb-2">Быстрое отключение</div>
+          <p class="text-gray-400 text-sm">Переключайте тоггл в заголовке правила — временно выключайте отдельные правила без их удаления.</p>
+        </div>
+        <div class="feature-card">
+          <div class="text-2xl mb-3">🔤</div>
+          <div class="font-bold text-white mb-2">Регистр триггера</div>
+          <p class="text-gray-400 text-sm">По умолчанию регистр игнорируется. Включите «Учитывать регистр» если нужно точное совпадение.</p>
+        </div>
+        <div class="feature-card">
+          <div class="text-2xl mb-3">💾</div>
+          <div class="font-bold text-white mb-2">Автосохранение</div>
+          <p class="text-gray-400 text-sm">Все настройки сохраняются автоматически через <code class="text-indigo-300 text-xs">BdApi.Data</code>. Правила не теряются при перезапуске.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Звуки ── -->
+  <div id="tab-sounds" class="tab-content">
+    <div class="flex flex-col gap-6">
+      <div class="feature-card">
+        <h2 class="font-bold text-white text-lg mb-2">8 встроенных звуков</h2>
+        <p class="text-gray-400 text-sm mb-5">Нажмите кнопку, чтобы прослушать звук прямо здесь. Все звуки генерируются через Web Audio API — файлы не нужны.</p>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="sound-demo-grid">
+          <!-- Кнопки заполнит JS -->
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <h2 class="font-bold text-white text-lg mb-2">Загрузка своего звука</h2>
+        <p class="text-gray-400 text-sm mb-4">Поддерживаемые форматы: <span class="text-green-400">MP3, WAV, OGG, FLAC</span> и любые другие, поддерживаемые браузером.</p>
+
+        <div class="bg-gray-800/50 rounded-xl border border-dashed border-gray-600 p-5">
+          <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div class="flex-1">
+              <div class="font-medium text-white mb-1">Тест загрузки звука</div>
+              <p class="text-gray-400 text-xs">Выберите аудиофайл — он воспроизведётся прямо в браузере. В плагине аналогичный механизм.</p>
+            </div>
+            <div class="flex gap-3 items-center">
+              <input type="file" id="demo-file" accept="audio/*" class="hidden" />
+              <button onclick="document.getElementById('demo-file').click()"
+                      class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors whitespace-nowrap">
+                📂 Выбрать файл
+              </button>
+              <span id="demo-filename" class="text-green-400 text-sm"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 bg-gray-800/30 rounded-lg p-4">
+          <div class="font-medium text-white text-sm mb-2">Как это работает в плагине:</div>
+          <ol class="text-gray-400 text-sm flex flex-col gap-1.5">
+            <li>1. Файл читается через <code class="text-indigo-300 bg-gray-900 px-1 rounded text-xs">FileReader.readAsDataURL()</code></li>
+            <li>2. Base64 данные сохраняются в <code class="text-indigo-300 bg-gray-900 px-1 rounded text-xs">BdApi.Data</code> (внутри плагина)</li>
+            <li>3. При срабатывании — декодируется и воспроизводится через <code class="text-indigo-300 bg-gray-900 px-1 rounded text-xs">AudioContext</code></li>
+            <li>4. ⚠️ Большие файлы увеличивают размер сохранённых данных. Рекомендуется до <strong class="text-yellow-400">500 КБ</strong>.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <h2 class="font-bold text-white text-lg mb-3">Параметры звуков</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-700">
+                <th class="text-left text-gray-500 font-semibold pb-3 pr-4">Звук</th>
+                <th class="text-left text-gray-500 font-semibold pb-3 pr-4">Тип волны</th>
+                <th class="text-left text-gray-500 font-semibold pb-3 pr-4">Частота</th>
+                <th class="text-left text-gray-500 font-semibold pb-3">Длит.</th>
+              </tr>
+            </thead>
+            <tbody id="sounds-table">
+              <!-- JS заполнит -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Код ── -->
+  <div id="tab-code" class="tab-content">
+    <div class="flex flex-col gap-6">
+
+      <div class="feature-card">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-white text-lg">Ключевые части кода</h2>
+          <a href="ChannelAlertPro.plugin.js" download
+             class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-semibold transition-colors">
+            ⬇ Скачать полный код
+          </a>
+        </div>
+
+        <!-- Блоки кода -->
+        <div class="flex flex-col gap-6">
+
+          <div>
+            <div class="text-xs font-bold text-gray-500 uppercase mb-2">📡 Поиск FluxDispatcher (многоуровневый)</div>
+            <div class="code-block">
+<pre><span class="kw">function</span> <span class="fn">findDispatcher</span>() {
+  <span class="kw">const</span> tries = [
+    () =&gt; BdApi.Webpack.<span class="fn">getByKeys</span>(<span class="str">'_actionHandlers'</span>, <span class="str">'_subscriptions'</span>),
+    () =&gt; BdApi.Webpack.<span class="fn">getByKeys</span>(<span class="str">'actionLogger'</span>),
+    () =&gt; BdApi.Webpack.<span class="fn">getByKeys</span>(<span class="str">'_dispatcher'</span>)?.<span class="fn">_dispatcher</span>,
+    () =&gt; BdApi.Webpack.<span class="fn">getModule</span>(m =&gt;
+      m &amp;&amp; <span class="kw">typeof</span> m.subscribe === <span class="str">'function'</span>
+      &amp;&amp; m._subscriptions
+    ),
+  ];
+  <span class="kw">for</span> (<span class="kw">const</span> fn <span class="kw">of</span> tries) {
+    <span class="kw">try</span> {
+      <span class="kw">const</span> r = <span class="fn">fn</span>();
+      <span class="kw">if</span> (r &amp;&amp; <span class="kw">typeof</span> r.subscribe === <span class="str">'function'</span>) <span class="kw">return</span> r;
+    } <span class="kw">catch</span> (_) {}
+  }
+  <span class="kw">return null</span>;
+}</pre>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-bold text-gray-500 uppercase mb-2">🎯 Обработчик сообщений</div>
+            <div class="code-block">
+<pre><span class="kw">this</span>._handler = (event) =&gt; {
+  <span class="kw">const</span> msg = event?.message;
+  <span class="kw">if</span> (!msg?.channel_id || !msg?.content) <span class="kw">return</span>;
+
+  <span class="kw">const</span> rules = <span class="kw">this</span>.rules;
+  <span class="kw">for</span> (<span class="kw">const</span> rule <span class="kw">of</span> rules) {
+    <span class="kw">if</span> (!rule.enabled) <span class="kw">continue</span>;
+    <span class="kw">if</span> (msg.channel_id !== rule.channelId) <span class="kw">continue</span>;
+
+    <span class="kw">const</span> content = rule.matchCase
+      ? msg.content
+      : msg.content.<span class="fn">toLowerCase</span>();
+    <span class="kw">const</span> trigger = rule.matchCase
+      ? rule.trigger
+      : rule.trigger.<span class="fn">toLowerCase</span>();
+
+    <span class="kw">if</span> (content.<span class="fn">includes</span>(trigger)) {
+      <span class="fn">playSound</span>(rule);  <span class="cm">// звук</span>
+      <span class="kw">if</span> (rule.showToast)
+        BdApi.UI.<span class="fn">showToast</span>(<span class="str">`🔔 ${rule.name}: ...`</span>);
+    }
+  }
+};
+
+dispatcher.<span class="fn">subscribe</span>(<span class="str">'MESSAGE_CREATE'</span>, <span class="kw">this</span>._handler);</pre>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-bold text-gray-500 uppercase mb-2">🔊 Воспроизведение звука (с поддержкой кастомных)</div>
+            <div class="code-block">
+<pre><span class="kw">function</span> <span class="fn">playSound</span>(rule) {
+  <span class="kw">const</span> ctx = <span class="kw">new</span> AudioContext();
+
+  <span class="kw">if</span> (rule.customB64) {
+    <span class="cm">// Кастомный звук из Base64</span>
+    <span class="kw">const</span> bytes = <span class="fn">base64ToBytes</span>(rule.customB64);
+    ctx.<span class="fn">decodeAudioData</span>(bytes.buffer, decoded =&gt; {
+      <span class="kw">const</span> src  = ctx.<span class="fn">createBufferSource</span>();
+      <span class="kw">const</span> gain = ctx.<span class="fn">createGain</span>();
+      gain.gain.value = rule.volume;
+      src.buffer = decoded;
+      src.<span class="fn">connect</span>(gain).<span class="fn">connect</span>(ctx.destination);
+      src.<span class="fn">start</span>();
+    });
+    <span class="kw">return</span>;
+  }
+
+  <span class="cm">// Встроенный звук — генерация WAV на лету</span>
+  <span class="kw">const</span> b64 = <span class="fn">generateBeep</span>(preset.freq1, preset.freq2);
+  <span class="cm">// ... декодирование и воспроизведение</span>
+}</pre>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-bold text-gray-500 uppercase mb-2">💾 Сохранение настроек</div>
+            <div class="code-block">
+<pre><span class="cm">// Загрузка правил</span>
+<span class="kw">get</span> <span class="fn">rules</span>() {
+  <span class="kw">return</span> BdApi.Data.<span class="fn">load</span>(<span class="kw">this</span>.meta.name, <span class="str">'rules'</span>) || [];
+}
+
+<span class="cm">// Сохранение правил</span>
+<span class="fn">saveRules</span>(rules) {
+  BdApi.Data.<span class="fn">save</span>(<span class="kw">this</span>.meta.name, <span class="str">'rules'</span>, rules);
+}
+
+<span class="cm">// Структура правила</span>
+<span class="kw">const</span> rule = {
+  id:        <span class="str">'уникальный_id'</span>,
+  name:      <span class="str">'Название'</span>,
+  enabled:   <span class="kw">true</span>,
+  channelId: <span class="str">'881306138686148679'</span>,
+  trigger:   <span class="str">'[Тикет]:'</span>,
+  matchCase: <span class="kw">false</span>,
+  sound:     <span class="str">'ding'</span>,
+  customB64: <span class="kw">null</span>,  <span class="cm">// или base64 строка</span>
+  volume:    <span class="num">0.8</span>,
+  showToast: <span class="kw">true</span>,
+};</pre>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Changelog -->
+      <div class="feature-card">
+        <h2 class="font-bold text-white text-lg mb-4">История изменений</h2>
+        <div class="flex flex-col gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="badge bg-indigo-600 text-white">v2.0.0</span>
+              <span class="text-gray-500 text-xs">Текущая версия</span>
+            </div>
+            <div class="flex flex-col gap-2 pl-2">
+              <div class="changelog-item"><span class="changelog-icon">🆕</span><span class="text-gray-300 text-sm">Мульти-правила: неограниченное количество каналов и триггеров</span></div>
+              <div class="changelog-item"><span class="changelog-icon">🎵</span><span class="text-gray-300 text-sm">8 встроенных звуков + загрузка своих MP3/WAV/OGG</span></div>
+              <div class="changelog-item"><span class="changelog-icon">🎚️</span><span class="text-gray-300 text-sm">Регулировка громкости для каждого правила</span></div>
+              <div class="changelog-item"><span class="changelog-icon">🔤</span><span class="text-gray-300 text-sm">Опция учёта регистра триггера</span></div>
+              <div class="changelog-item"><span class="changelog-icon">💾</span><span class="text-gray-300 text-sm">Автосохранение через BdApi.Data (настройки не теряются)</span></div>
+              <div class="changelog-item"><span class="changelog-icon">🎨</span><span class="text-gray-300 text-sm">Полноценная панель настроек с нативным дизайном Discord</span></div>
+            </div>
+          </div>
+          <div class="h-px bg-gray-800"></div>
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge bg-gray-700 text-gray-400">v1.2.0</span>
+            </div>
+            <div class="flex flex-col gap-1 pl-2">
+              <div class="changelog-item"><span class="changelog-icon">🔧</span><span class="text-gray-500 text-sm">Исправлен поиск FluxDispatcher (4 метода)</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge bg-gray-700 text-gray-400">v1.0.0</span>
+            </div>
+            <div class="flex flex-col gap-1 pl-2">
+              <div class="changelog-item"><span class="changelog-icon">🎉</span><span class="text-gray-500 text-sm">Первый релиз — один канал, один триггер</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════ FOOTER ══════ -->
+<footer class="border-t border-gray-800 mt-10">
+  <div class="max-w-5xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
+    <div>ChannelAlertPro v2.0.0 — BetterDiscord Plugin</div>
+    <div class="flex items-center gap-4">
+      <span class="text-green-600">● Совместим с актуальным BetterDiscord</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ══════ Табы ══════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════ Звуки (Web Audio API) ══════
+const SOUNDS = {
+  ding:   { label: '🔔 Динь',     freq1: 880,  freq2: 1100, type: 'sine',     dur: 0.22 },
+  alert:  { label: '🚨 Тревога',  freq1: 660,  freq2: 880,  type: 'sine',     dur: 0.20 },
+  pop:    { label: '💬 Поп',      freq1: 1200, freq2: 900,  type: 'sine',     dur: 0.10 },
+  chime:  { label: '🎵 Колокол',  freq1: 523,  freq2: 784,  type: 'sine',     dur: 0.30 },
+  blip:   { label: '📟 Блип',     freq1: 1000, freq2: 1000, type: 'square',   dur: 0.12 },
+  urgent: { label: '⚡ Срочно',   freq1: 440,  freq2: 880,  type: 'square',   dur: 0.25 },
+  soft:   { label: '🌙 Мягкий',   freq1: 698,  freq2: 523,  type: 'sine',     dur: 0.28 },
+  retro:  { label: '👾 Ретро',    freq1: 800,  freq2: 600,  type: 'sawtooth', dur: 0.15 },
+};
+
+function playDemoSound(freq1, freq2, dur, type, vol = 0.7) {
+  const sampleRate = 44100;
+  const numSamples = Math.floor(sampleRate * dur * 2);
+  const buffer = new ArrayBuffer(44 + numSamples * 2);
+  const view = new DataView(buffer);
+  const ws = (o, s) => { for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
+  ws(0,'RIFF'); view.setUint32(4,36+numSamples*2,true); ws(8,'WAVE'); ws(12,'fmt ');
+  view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,1,true);
+  view.setUint32(24,sampleRate,true); view.setUint32(28,sampleRate*2,true);
+  view.setUint16(32,2,true); view.setUint16(34,16,true); ws(36,'data');
+  view.setUint32(40,numSamples*2,true);
+  const half = Math.floor(numSamples/2);
+  for (let i=0;i<numSamples;i++) {
+    const f = i<half?freq1:freq2;
+    const t = i/sampleRate;
+    const env = i<512?i/512:i>numSamples-512?(numSamples-i)/512:1;
+    let s;
+    if(type==='square') s=Math.sign(Math.sin(2*Math.PI*f*t));
+    else if(type==='sawtooth') s=2*((f*t)%1)-1;
+    else s=Math.sin(2*Math.PI*f*t);
+    view.setInt16(44+i*2, Math.round(s*env*28000), true);
+  }
+  let bin=''; const bytes=new Uint8Array(buffer);
+  for(let i=0;i<bytes.byteLength;i++) bin+=String.fromCharCode(bytes[i]);
+  const b64=btoa(bin);
+  const binDec=atob(b64); const arr=new Uint8Array(binDec.length);
+  for(let i=0;i<binDec.length;i++) arr[i]=binDec.charCodeAt(i);
+  const ctx=new AudioContext();
+  ctx.decodeAudioData(arr.buffer, decoded=>{
+    const src=ctx.createBufferSource();
+    const gain=ctx.createGain();
+    gain.gain.value=vol;
+    src.buffer=decoded;
+    src.connect(gain); gain.connect(ctx.destination);
+    src.start();
+    src.onended=()=>ctx.close();
+  });
+}
+
+// Заполнить грид демо-звуков
+const grid = document.getElementById('sound-demo-grid');
+if (grid) {
+  Object.entries(SOUNDS).forEach(([key, s]) => {
+    const btn = document.createElement('button');
+    btn.className = 'sound-demo-btn';
+    btn.textContent = s.label;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sound-demo-btn').forEach(b => b.classList.remove('playing'));
+      btn.classList.add('playing');
+      playDemoSound(s.freq1, s.freq2, s.dur, s.type);
+      setTimeout(() => btn.classList.remove('playing'), (s.dur * 2 + 0.1) * 1000);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+// Заполнить таблицу звуков
+const tbody = document.getElementById('sounds-table');
+if (tbody) {
+  Object.entries(SOUNDS).forEach(([key, s]) => {
+    const tr = document.createElement('tr');
+    tr.className = 'border-b border-gray-800/60';
+    tr.innerHTML = `
+      <td class="py-2.5 pr-4 font-medium text-white">${s.label}</td>
+      <td class="py-2.5 pr-4 text-indigo-300 font-mono text-xs">${s.type}</td>
+      <td class="py-2.5 pr-4 text-green-400 font-mono text-xs">${s.freq1}→${s.freq2} Гц</td>
+      <td class="py-2.5 text-yellow-400 font-mono text-xs">${(s.dur*2*1000).toFixed(0)} мс</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// GitHub username подстановка
+document.querySelectorAll('[data-gh-link]').forEach(el => {
+  el.addEventListener('click', () => {
+    const uname = document.getElementById('gh-username')?.value?.trim();
+    if (uname) {
+      const base = `https://github.com/${uname}/ChannelAlertPro`;
+      const suffix = el.dataset.ghLink;
+      window.open(base + suffix, '_blank');
+    } else {
+      alert('Введите ваш GitHub username выше!');
+      document.getElementById('gh-username')?.focus();
+    }
+  });
+});
+
+// Копирование команд
+document.querySelectorAll('.copy-cmd').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const code = btn.previousElementSibling?.textContent || btn.parentElement.querySelector('code')?.textContent;
+    if (code) {
+      navigator.clipboard.writeText(code.trim()).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✓';
+        btn.style.color = '#57f287';
+        setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+      });
+    }
+  });
+});
+
+// Демо загрузки файла
+const demoFile = document.getElementById('demo-file');
+const demoName = document.getElementById('demo-filename');
+if (demoFile) {
+  demoFile.addEventListener('change', () => {
+    const file = demoFile.files[0];
+    if (!file) return;
+    demoName.textContent = '✓ ' + file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const full = e.target.result;
+      const b64 = full.split(',')[1];
+      const bin = atob(b64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const ctx = new AudioContext();
+      ctx.decodeAudioData(arr.buffer, decoded => {
+        const src = ctx.createBufferSource();
+        const gain = ctx.createGain();
+        gain.gain.value = 0.8;
+        src.buffer = decoded;
+        src.connect(gain); gain.connect(ctx.destination);
+        src.start();
+        src.onended = () => ctx.close();
+      }).catch(() => { demoName.textContent = '❌ Ошибка декодирования'; });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+</script>
+</body>
+</html>
+
